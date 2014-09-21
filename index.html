@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Contact Example</title>
-
-    <script type="text/javascript" charset="utf-8" src="phonegap-1.2.0.js"></script>
+<head>
+   <script>
+          var connected;
+          if(navigator.onLine) { 
+       document.write('iPad unit is <b>Connected</b>');
+       connected='y';
+    }    else    {
+       document.write('iPad unit is <b>Off-line</b>');
+       connected='n';
+    }
+    
+    
+</script>
     <script type="text/javascript" charset="utf-8">
 
     // Wait for PhoneGap to load
     //
-    document.addEventListener("deviceready", onDeviceReady, false);
+//    document.addEventListener("deviceready", onDeviceReady, false);
 
     // Populate the database 
     //
@@ -28,17 +37,18 @@
     // Query the success callback
     //
     function querySuccess(tx, results) {
-        var len = results.rows.length;
-        console.log("DEMO table: " + len + " rows found.");
-        for (var i=0; i<len; i++){
-            console.log("Row = " + i + " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data);
-        }
+        // this will be empty since no rows were inserted.
+        document.write("Insert ID = " + results.insertId);
+        // this will be 0 since it is a select statement
+        document.write("Rows Affected = " + results.rowAffected);
+        // the number of rows returned by the select statement
+        document.write("Insert ID = " + results.rows.length);
     }
 
     // Transaction error callback
     //
     function errorCB(err) {
-        console.log("Error processing SQL: "+err.code);
+        document.write("Error processing SQL: "+err.code);
     }
 
     // Transaction success callback
