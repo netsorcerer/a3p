@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
 <head>
-   <script>
+<script type="text/javascript">
           var connected;
           if(navigator.onLine) { 
        document.write('iPad unit is <b>Connected</b>');
@@ -10,67 +10,32 @@
        document.write('iPad unit is <b>Off-line</b>');
        connected='n';
     }
-    
-    
+
+
+var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+var msg;
+db.transaction(function (tx) {
+  tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, log)');
+  tx.executeSql('INSERT INTO LOGS (id, log) VALUES (1, "foobar")');
+  tx.executeSql('INSERT INTO LOGS (id, log) VALUES (2, "logmsg")');
+  msg = '<p>Log message created and row inserted.</p>';
+  document.querySelector('#status').innerHTML =  msg;
+});
+
+db.transaction(function (tx) {
+  tx.executeSql('SELECT * FROM LOGS', [], function (tx, results) {
+   var len = results.rows.length, i;
+   msg = "<p>Found rows: " + len + "</p>";
+   document.querySelector('#status').innerHTML +=  msg;
+   for (i = 0; i < len; i++){
+     msg = "<p><b>" + results.rows.item(i).log + "</b></p>";
+     document.querySelector('#status').innerHTML +=  msg;
+   }
+ }, null);
+});
 </script>
-<script type="text/javascript" charset="utf-8" src="phonegap-1.2.0.js"></script>
-    <script type="text/javascript" charset="utf-8">
-    <script type="text/javascript" charset="utf-8">
-
-    // Wait for PhoneGap to load
-    //
-    document.addEventListener("deviceready", onDeviceReady, false);
-
-    // Populate the database 
-    //
-    function populateDB(tx) {
-        tx.executeSql('DROP TABLE IF EXISTS DEMO');
-        tx.executeSql('CREATE TABLE IF NOT EXISTS DEMO (id unique, data)');
-        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "First row")');
-        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")');
-    }
-
-    // Query the database
-    //
-    function queryDB(tx) {
-        tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
-    }
-
-    // Query the success callback
-    //
-    function querySuccess(tx, results) {
-        // this will be empty since no rows were inserted.
-        document.write("Insert ID = " + results.insertId);
-        // this will be 0 since it is a select statement
-        document.write("Rows Affected = " + results.rowAffected);
-        // the number of rows returned by the select statement
-        document.write("Insert ID = " + results.rows.length);
-    }
-
-    // Transaction error callback
-    //
-    function errorCB(err) {
-        document.write("Error processing SQL: "+err.code);
-    }
-
-    // Transaction success callback
-    //
-    function successCB() {
-        var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
-        db.transaction(queryDB, errorCB);
-    }
-
-    // PhoneGap is ready
-    //
-    function onDeviceReady() {
-        var db = window.openDatabase("Database", "1.0", "PhoneGap Demo", 200000);
-        db.transaction(populateDB, errorCB, successCB);
-    }
-
-    </script>
-  </head>
-  <body>
-    <h1>Example</h1>
-    <p>Database</p>
-  </body>
+</head>
+<body>
+<div id="status" name="status">Status Message</div>
+</body>
 </html>
