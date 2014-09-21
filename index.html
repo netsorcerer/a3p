@@ -1,16 +1,33 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<script type='text/javascript' src='https://code.jquery.com/jquery-1.9.1.js'></script>
 <script type="text/javascript">
+window.onload = function()
+{
           var connected;
           if(navigator.onLine) { 
-       document.write('iPad unit is <b>Connected</b>');
+       document.getElementById("conn_status").innerHTML =  "Device Connected";
        connected='y';
     }    else    {
-       document.write('iPad unit is <b>Off-line</b>');
+       document.getElementById("conn_status").innerHTML =  "<font color='red'>Device Off Line!</font>";
        connected='n';
     }
 
+function getCookie(name) {
+  var regexp = new RegExp("(?:^" + name + "|;\s*"+ name + ")=(.*?)(?:;|$)", "g");
+  var result = regexp.exec(document.cookie);
+  return (result === null) ? null : result[1];
+}    
+    
+    var u_id=getCookie("u_id");
+    if (u_id==null)    {
+       $('#cookie_status').html("u_id is null");
+        exit;
+    }
+    else    {
+        document.write(u_id);
+    }
 
 var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
 var msg;
@@ -33,9 +50,16 @@ db.transaction(function (tx) {
    }
  }, null);
 });
+
+}//onload
 </script>
 </head>
-<body>
-<div id="status" name="status">Status Message</div>
+<body style="background-color: blue;">
+<div id="cookie_status">cookie status</div>
+<div style="text-align: center; font-size: 1.3em; font-weight: bold; background-color: white;">A3P Technologies E.R.P.
+    <div  name="conn_status" id="conn_status" style="float: right; font-size: .7em; color: brown; font-weight: normal;">status</div>
+</div><br>
+<div id="status" name="status" style="background-color: white;">Status Message</div>
+
 </body>
 </html>
