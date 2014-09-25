@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="main.css">
+<style>
+</style>
+<script type="text/javascript">
+window.onload = function()
+{
+          var connected;
+          if(navigator.onLine) { 
+       document.getElementById("conn_status").innerHTML =  "Device Connected";
+       connected='y';
+    }    else    {
+       document.getElementById("conn_status").innerHTML =  "<font color='red'>Device Off Line!</font>";
+       connected='n';
+    }
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function getCookie(name) {
+  var regexp = new RegExp("(?:^" + name + "|;\s*"+ name + ")=(.*?)(?:;|$)", "g");
+  var result = regexp.exec(document.cookie);
+  return (result === null) ? null : result[1];
+}  
+
+var erp_type = getParameterByName('erp_type');
+var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+if (erp_type!==null)    {
+db.transaction(function (tx) {
+   tx.executeSql('SELECT * FROM checklist_items where erp_type_id='+erp_type, [], function (tx, results) {
+   var len = results.rows.length, i;
+   msg = "<p>Found rows: " + len + "</p>";
+   var main_content;
+   for (i = 0; i < len; i++){
+      main_content=main_content+"<b>"+(i+1)+". </b>"+results.rows.item(i).time_frame+" "+ results.rows.item(i).content+"<br><br>";
+   
+   }
+document.getElementById("main_content").innerHTML =  main_content;
+ }, null);
+});    
+document.getElementById("erp_title").innerHTML =  erp_type;
+}
+}//window load  
+</script>
+</head>
+<body style="background-color: blue;">
+<div id="main" style=" background-color: white;">
+    <div id="title" style="text-align: center; font-size: 1.3em; font-weight: bold;">
+        <div class="cookie_status" id="cookie_status">cookie status</div>A3P Technologies E.R.P.
+            <div  name="conn_status" id="conn_status" style="float: right; font-size: .7em; color: brown; font-weight: normal;">status</div>
+    </div title>
+<br>
+<div class="content" id="my_content" name="my_content" style="background-color: white;">ERP Content
+    ERP Type <div id="erp_title">title</div><br>
+    <div id="main_content">dynamically rendered content should be here</div>
+</div>
+</div main>
+</body>
+</html>
