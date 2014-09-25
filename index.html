@@ -52,7 +52,7 @@ db.transaction(function (tx) {
 //  msg = '<p>Log message created and row inserted.</p>';
 //  document.querySelector('#status').innerHTML =  msg;
 });
- 
+ if (connected=="y")    {
 var k="";
     $.ajax({
    
@@ -74,11 +74,30 @@ for (var i = 0; i < response.data.length; i++) {
   tx.executeSql("INSERT INTO checklist_items (company_id,erp_role,erp_type_id,position_in_checklist,time_frame,content,appended_content,standardized_item_id,modified_ts) VALUES ('"+response.data[i].c_id+"','"+response.data[i].erp_role+"','"+response.data[i].erp_type_id+"','"+response.data[i].position_in_checklist+"','"+response.data[i].time_frame+"','"+response.data[i].content+"','"+response.data[i].appended_content[i]+"','"+response.data[i].standardized_item_id[i]+"','"+response.data[i].modified_ts+"')");
 }
 document.getElementById("demo").innerHTML = num_items+" rows updated";
- });
+ 
+
+    var erp_buttons=0;
+  tx.executeSql('SELECT DISTINCT "erp_type_id","description"  FROM checklist_items', [], function (tx, results) {
+   var len = results.rows.length, i;
+   for (i = 0; i < len; i++){
+   if (erp_buttons==0) {
+       erp_buttons="<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>"
+      // 
+   } else   {
+  erp_buttons=erp_buttons+"<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>";
+  //+results.rows.item(i).erp_type_id+"'>"+results.rows.item(i).erp_type_id+"</a>"
+   }
+   }
+document.getElementById("erp_buttons").innerHTML = erp_buttons;
+
+  }, null);
+
+
+});
    
         }
     });
-    
+ }//connected=y    
  //        $('#demo').innerHTML(k);
 
 /*db.transaction(function (tx) {
@@ -108,24 +127,8 @@ document.getElementById("demo").innerHTML = num_items+" rows updated";
 <br>
 <div class="content" id="my_content" name="my_content" style="background-color: white;">My Content<br>
 <script type="text/javascript">
-var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
-db.transaction(function (tx) {
-    var erp_buttons=0;
-  tx.executeSql('SELECT DISTINCT "erp_type_id","description"  FROM checklist_items', [], function (tx, results) {
-   var len = results.rows.length, i;
-   for (i = 0; i < len; i++){
-   if (erp_buttons==0) {
-       erp_buttons="<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>"
-      // 
-   } else   {
-  erp_buttons=erp_buttons+"<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>";
-  //+results.rows.item(i).erp_type_id+"'>"+results.rows.item(i).erp_type_id+"</a>"
-   }
-   }
-document.getElementById("erp_buttons").innerHTML = erp_buttons;
-
-  }, null);
-  })
+//var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+  
 </script>
 <a class="button" href="erp_content.html?erp_type=1">ERP Type 1</a>    
     
