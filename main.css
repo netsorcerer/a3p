@@ -30,6 +30,7 @@ div.content {
   border-right: 1px solid #333333;
   border-bottom: 1px solid #333333;
   border-left: 1px solid #CCCCCC;
+  border-radius: 10px;
 }
 .cookie_status  {
     float: left; 
@@ -51,4 +52,13 @@ div#title  {
    text-align: center; 
    font-size: 1.3em; 
    font-weight: bold;
+}
+div#nav_array   {
+    background-color: brown;
+    padding: 5px;
+}
+div#erp_buttons {
+    padding: 10px 10px;
+    background-color: red;
+    color: white;
 }
