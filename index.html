@@ -43,6 +43,7 @@ var msg;
 db.transaction(function (tx) {
   tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, log)');
   tx.executeSql('CREATE TABLE IF NOT EXISTS users (id unique, u_id, password)');
+  tx.executeSql('CREATE TABLE IF NOT EXISTS erp_types (id unique, erp_type_id, version)');
   tx.executeSql('drop table  IF EXISTS checklist_items ');
  tx.executeSql('CREATE TABLE IF NOT EXISTS checklist_items (id INTEGER PRIMARY KEY, company_id INTEGER, erp_role INTEGER, erp_type_id INTEGER, position_in_checklist INTEGER, time_frame TEXT, content TEXT, appended_content TEXT, standardized_item_id INTEGER, modified_ts TEXT)');
 
@@ -53,10 +54,10 @@ db.transaction(function (tx) {
 });
  
 var k="";
- $.ajax({
+    $.ajax({
    
         type: 'POST',
-        url: "https://a3ptech.com/app/index_ajax.php?action=get_initialization_data",
+        url: "https://a3ptech.com/app/index_ajax.php?action=get_checklist_items",
         data: '',
         dataType: 'json',
         success: function(response){
@@ -106,10 +107,32 @@ document.getElementById("demo").innerHTML = num_items+" rows updated";
     </div title>
 <br>
 <div class="content" id="my_content" name="my_content" style="background-color: white;">My Content<br>
-    <a class="button" href="erp_content.html?erp_type=1">ERP Type 1</a>
+<script type="text/javascript">
+var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+db.transaction(function (tx) {
+    var erp_buttons=0;
+  tx.executeSql('SELECT DISTINCT "erp_type_id","description"  FROM checklist_items', [], function (tx, results) {
+   var len = results.rows.length, i;
+   for (i = 0; i < len; i++){
+   if (erp_buttons==0) {
+       erp_buttons="<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>"
+      // 
+   } else   {
+  erp_buttons=erp_buttons+"<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>";
+  //+results.rows.item(i).erp_type_id+"'>"+results.rows.item(i).erp_type_id+"</a>"
+   }
+   }
+document.getElementById("erp_buttons").innerHTML = erp_buttons;
+
+  }, null);
+  })
+</script>
+<a class="button" href="erp_content.html?erp_type=1">ERP Type 1</a>    
     
 </div>
 <div id="demo">demo</div>
+<div id="erp_buttons">demo</div>
+
 </div main>
 </body>
 </html>
