@@ -42,7 +42,9 @@ var msg;
 db.transaction(function (tx) {
   tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, log)');
   tx.executeSql('CREATE TABLE IF NOT EXISTS users (id unique, u_id, password)');
-  tx.executeSql('CREATE TABLE IF NOT EXISTS erp_types (id unique, erp_type_id, version)');
+  tx.executeSql('drop table  IF EXISTS erp_types');
+  tx.executeSql('CREATE TABLE IF NOT EXISTS erp_types (id INTEGER PRIMARY KEY, erp_type_id INTEGER, description TEXT, version INTEGER)');
+    tx.executeSql("INSERT INTO erp_types (erp_type_id, description, version) VALUES (1,'foo',3)"); 
 
 
 //  tx.executeSql('INSERT INTO LOGS (id, log) VALUES (2, "logmsg")');
@@ -67,23 +69,29 @@ db.transaction(function (tx) {
  tx.executeSql('CREATE TABLE IF NOT EXISTS checklist_items (id INTEGER PRIMARY KEY, company_id INTEGER, erp_role INTEGER, erp_type_id INTEGER, position_in_checklist INTEGER, time_frame TEXT, content TEXT, appended_content TEXT, standardized_item_id INTEGER, modified_ts TEXT)');
 var num_items=response.data.length;
 for (var i = 0; i < response.data.length; i++) {
-//    document.write(num_items);
-//////THIS IS IT !!!!!/////
 // tx.executeSql("INSERT INTO checklist_items (company_id,content) VALUES ('"+response.data[i].standardized_item_id+"','"+response.data[i].content+"')");
   tx.executeSql("INSERT INTO checklist_items (company_id,erp_role,erp_type_id,position_in_checklist,time_frame,content,appended_content,standardized_item_id,modified_ts) VALUES ('"+response.data[i].c_id+"','"+response.data[i].erp_role+"','"+response.data[i].erp_type_id+"','"+response.data[i].position_in_checklist+"','"+response.data[i].time_frame+"','"+response.data[i].content+"','"+response.data[i].appended_content[i]+"','"+response.data[i].standardized_item_id[i]+"','"+response.data[i].modified_ts+"')");
 }
-document.getElementById("demo").innerHTML = num_items+" rows updated";
- 
+document.getElementById("demo").innerHTML = num_items+" rows updated at "+new Date();
+////////////  NOW collect and insert version records for all erp types involved /////////////    
+//alert(response.data2[1].description);
+    tx.executeSql("delete from erp_types"); 
+//var num_items=response.data2.length;
+for (var i = 0; i < response.data2.length; i++) {
+   
+    tx.executeSql("INSERT INTO erp_types (erp_type_id, description, version) VALUES ('"+response.data2[i].erp_type_id+"','"+response.data2[i].description+"','"+response.data2[i].version+"')"); 
+}//loop i 
 
+////////////  NOW collect data and draw appropriate buttons for all erp types involved /////////////    
     var erp_buttons=0;
-  tx.executeSql('SELECT DISTINCT "erp_type_id","description"  FROM checklist_items', [], function (tx, results) {
+  tx.executeSql('SELECT *  FROM erp_types', [], function (tx, results) {
    var len = results.rows.length, i;
    for (i = 0; i < len; i++){
    if (erp_buttons==0) {
-       erp_buttons="<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>"
+       erp_buttons=results.rows.item(i).description+" ERP ("+results.rows.item(i).erp_type_id+") Ver.: "+results.rows.item(i).version+"&nbsp;&nbsp;&nbsp;<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a><br><br>"
       // 
    } else   {
-  erp_buttons=erp_buttons+"<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>";
+  erp_buttons=erp_buttons+results.rows.item(i).description+" ERP ("+results.rows.item(i).erp_type_id+") Ver.: "+results.rows.item(i).version+"&nbsp;&nbsp;&nbsp;<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a><br><br>";
   //+results.rows.item(i).erp_type_id+"'>"+results.rows.item(i).erp_type_id+"</a>"
    }
    }
@@ -96,8 +104,9 @@ document.getElementById("erp_buttons").innerHTML = erp_buttons;
    
         }
     });
+    
  }//connected=y 
- else   {
+ else   {///connected=no
 db.transaction(function (tx) {
      var erp_buttons=0;
   tx.executeSql('SELECT DISTINCT "erp_type_id","description"  FROM checklist_items', [], function (tx, results) {
@@ -117,7 +126,7 @@ document.getElementById("erp_buttons").innerHTML = erp_buttons;
 
 });
     
- }   //else, handle connected=n
+ }   //handle connected=n
  //        $('#demo').innerHTML(k);
 
 /*db.transaction(function (tx) {
@@ -145,15 +154,15 @@ document.getElementById("erp_buttons").innerHTML = erp_buttons;
             <div class="conn_status"   name="conn_status" id="conn_status" >status</div>
     </div title>
 <br>
-<div class="content" id="my_content" name="my_content" style="background-color: white;">My Content<br>
+<a class="button" href="index.html">Refresh</a>    
+<div class="content" id="my_content" name="my_content" style="background-color: white;"><br>
 <script type="text/javascript">
 //var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
   
 </script>
-<a class="button" href="erp_content.html?erp_type=1">ERP Type 1</a>    
     
 </div>
-<div id="demo">demo</div>
+<div id="demo">demo</div><br><br>
 <div id="erp_buttons">demo</div>
 
 </div main>
