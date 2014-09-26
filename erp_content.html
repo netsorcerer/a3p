@@ -2,11 +2,31 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="main.css">
+<script type='text/javascript' src='https://code.jquery.com/jquery-1.9.1.js'></script>
+<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 <style>
 </style>
 <script type="text/javascript">
+ $(document).ready(function(){
+
+   $("#main_content").on("click", "a",(function(){
+       alert('xxx');    
+       item_id=$(this).attr("id");
+        $('#ajax_container').show('slow');
+        $('#ajax_content').show();
+//        $.ajax({url:"https://a3ptech.com/resources_erp_ajax.php?action=contacts&run_id=<?php echo $_GET['run_id'];?>",success:function(result){
+//        $('#ajax_content').html(result);} 
+$('#ajax_content').html("xxxxxx");
+        }));
+   });
+</script>
+
+<script type="text/javascript">
+
+   
 window.onload = function()
 {
+ 
           var connected;
           if(navigator.onLine) { 
        document.getElementById("conn_status").innerHTML =  "Device Connected";
@@ -37,7 +57,7 @@ db.transaction(function (tx) {
    msg = "<p>Found rows: " + len + "</p>";
    var main_content;
    for (i = 0; i < len; i++){
-      main_content=main_content+"<b>"+(i+1)+". </b>"+results.rows.item(i).time_frame+" "+ results.rows.item(i).content+"<br><br>";
+      main_content=main_content+"<b>"+(i+1)+". </b>"+results.rows.item(i).time_frame+" "+ results.rows.item(i).content+"<a href=\"\" class=\"button ajax_opener\" onclick=\"return false;\" id=\""+results.rows.item(i).id+"\">Open</a><br><br>";
    
    }
 document.getElementById("main_content").innerHTML =  main_content;
@@ -45,10 +65,16 @@ document.getElementById("main_content").innerHTML =  main_content;
 });    
 document.getElementById("erp_title").innerHTML =  erp_type;
 }
+
 }//window load  
+
 </script>
 </head>
-<body style="background-color: blue;">
+<body style="background-color: black;">
+<div id="ajax_container" style="display: none;">
+    <div style="float:right;"><a href="" class="button" onclick="return false;">Close</a></div>
+    <div id="ajax_content"></div>
+</div>
 <div id="main" style=" background-color: white;">
     <div id="title" style="text-align: center; font-size: 1.3em; font-weight: bold;">
         <div class="cookie_status" id="cookie_status">cookie status</div>A3P Technologies E.R.P.
@@ -61,5 +87,6 @@ document.getElementById("erp_title").innerHTML =  erp_type;
     <div id="main_content">dynamically rendered content should be here</div>
 </div>
 </div main>
+<a href="" class="button ajax_opener" id="1" onclick="return false;">try it</a>
 </body>
 </html>
