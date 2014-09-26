@@ -10,15 +10,21 @@
  $(document).ready(function(){
 
    $("#main_content").on("click", "a",(function(){
-       alert('xxx');    
        item_id=$(this).attr("id");
         $('#ajax_container').show('slow');
         $('#ajax_content').show();
-//        $.ajax({url:"https://a3ptech.com/resources_erp_ajax.php?action=contacts&run_id=<?php echo $_GET['run_id'];?>",success:function(result){
-//        $('#ajax_content').html(result);} 
-$('#ajax_content').html("xxxxxx");
-        }));
-   });
+        $.ajax({url:"https://a3ptech.com/app/erp_content_ajax.php?action=item_detail&item_id="+item_id,success:function(result){
+        $('#ajax_content').html(result);} 
+        });
+
+   $("#closer_button_div").on("click", "a",(function(){
+        $('#ajax_container').hide('slow');
+}));  
+        
+   }));
+   
+   });  
+
 </script>
 
 <script type="text/javascript">
@@ -72,7 +78,7 @@ document.getElementById("erp_title").innerHTML =  erp_type;
 </head>
 <body style="background-color: black;">
 <div id="ajax_container" style="display: none;">
-    <div style="float:right;"><a href="" class="button" onclick="return false;">Close</a></div>
+    <div id="closer_button_div" style="float:right;"><a href="" class="button ajax_closer" onclick="return false;">Close</a></div>
     <div id="ajax_content"></div>
 </div>
 <div id="main" style=" background-color: white;">
@@ -84,7 +90,7 @@ document.getElementById("erp_title").innerHTML =  erp_type;
 <div id="nav_array"><a class="button" href="index.html">Main Menu</a></div>
 <div class="content" id="my_content" name="my_content" style="background-color: white;">ERP Content
     ERP Type <div id="erp_title">title</div><br>
-    <div id="main_content">dynamically rendered content should be here</div>
+    <div id="main_content" style="height: 100%; overflow: auto;">dynamically rendered content should be here</div>
 </div>
 </div main>
 <a href="" class="button ajax_opener" id="1" onclick="return false;">try it</a>
