@@ -108,9 +108,10 @@ document.getElementById("erp_buttons").innerHTML = erp_buttons;
  }//connected=y 
  else   {///connected=no
 db.transaction(function (tx) {
-     var erp_buttons=0;
+     var erp_buttons="";
   tx.executeSql('SELECT DISTINCT "erp_type_id","description"  FROM checklist_items', [], function (tx, results) {
    var len = results.rows.length, i;
+   erp_buttons="<h2>ERPs currently on this device:</h2>";
    for (i = 0; i < len; i++){
    if (erp_buttons==0) {
        erp_buttons="<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a>"
@@ -144,13 +145,13 @@ document.getElementById("erp_buttons").innerHTML = erp_buttons;
 }//onload
 </script>
 </head>
-<body style="background-color: blue;">
+<body style="background-color: black;">
     <div id="login" class="content" style="display: none;">
         Login
     </div login>
 <div id="main" style=" background-color: white; padding: 10px 10px;">
     <div id="title">
-        <div id="cookie_status" class="cookie_status">cookie status</div>A3P Technologies E.R.P.
+        <div id="cookie_status" class="cookie_status">cookie status</div><img src="https://a3ptech.com/images/a3p_fb_cover.jpg">
             <div class="conn_status"   name="conn_status" id="conn_status" >status</div>
     </div title>
 <br>
