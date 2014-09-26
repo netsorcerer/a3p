@@ -60,9 +60,19 @@ div#title  {
 div#nav_array   {
     background-color: brown;
     padding: 5px;
+     border-radius: 10px;
 }
 div#erp_buttons {
     padding: 10px 10px;
+    background-color: red;
+    color: white;
+     border-radius: 10px;
+}
+div#ajax_container {
+    padding: 10px 10px;
+    width: 100%;
+    height: 400px;
+    position: relative;
     background-color: red;
     color: white;
      border-radius: 10px;
