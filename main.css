@@ -47,11 +47,15 @@ div.content {
 #main{
     background-color: white; 
     padding: 10px 10px;
+      border-radius: 10px;
+
 }
 div#title  {
    text-align: center; 
    font-size: 1.3em; 
    font-weight: bold;
+     border-radius: 10px;
+
 }
 div#nav_array   {
     background-color: brown;
@@ -61,4 +65,5 @@ div#erp_buttons {
     padding: 10px 10px;
     background-color: red;
     color: white;
+     border-radius: 10px;
 }
