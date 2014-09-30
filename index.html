@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" href="main.css">
 <script type='text/javascript' src='https://code.jquery.com/jquery-1.9.1.js'></script>
 <script type="text/javascript">
+t_index=0;
 window.onload = function()
 {
          var connected;
@@ -65,12 +66,12 @@ var k="";
 //var jsonData = JSON.parse(response);
 var output="";
 db.transaction(function (tx) {
-  tx.executeSql('drop table  IF EXISTS checklist_items ');
- tx.executeSql('CREATE TABLE IF NOT EXISTS checklist_items (id INTEGER PRIMARY KEY, company_id INTEGER, erp_role INTEGER, erp_type_id INTEGER, position_in_checklist INTEGER, time_frame TEXT, content TEXT, appended_content TEXT, standardized_item_id INTEGER, modified_ts TEXT)');
+//  tx.executeSql('drop table  IF EXISTS checklist_items ');
+ tx.executeSql('CREATE TABLE IF NOT EXISTS checklist_items (id INTEGER PRIMARY KEY, company_id INTEGER, erp_role INTEGER, erp_type_id INTEGER, position_in_checklist INTEGER, time_frame TEXT, content TEXT, appended_content TEXT, standardized_item_id INTEGER, checklist_item_id INTEGER, modified_ts TEXT)');
 var num_items=response.data.length;
 for (var i = 0; i < response.data.length; i++) {
 // tx.executeSql("INSERT INTO checklist_items (company_id,content) VALUES ('"+response.data[i].standardized_item_id+"','"+response.data[i].content+"')");
-  tx.executeSql("INSERT INTO checklist_items (company_id,erp_role,erp_type_id,position_in_checklist,time_frame,content,appended_content,standardized_item_id,modified_ts) VALUES ('"+response.data[i].c_id+"','"+response.data[i].erp_role+"','"+response.data[i].erp_type_id+"','"+response.data[i].position_in_checklist+"','"+response.data[i].time_frame+"','"+response.data[i].content+"','"+response.data[i].appended_content[i]+"','"+response.data[i].standardized_item_id[i]+"','"+response.data[i].modified_ts+"')");
+  tx.executeSql("INSERT INTO checklist_items (company_id,erp_role,erp_type_id,position_in_checklist,time_frame,content,appended_content,standardized_item_id,checklist_item_id,modified_ts) VALUES ('"+response.data[i].c_id+"','"+response.data[i].erp_role+"','"+response.data[i].erp_type_id+"','"+response.data[i].position_in_checklist+"','"+response.data[i].time_frame+"','"+response.data[i].content+"','"+response.data[i].appended_content+"','"+response.data[i].standardized_item_id+"','"+response.data[i].checklist_item_id+"','"+response.data[i].modified_ts+"')");
 }
 document.getElementById("demo").innerHTML = num_items+" rows updated at "+new Date();
 ////////////  NOW collect and insert version records for all erp types involved /////////////    
@@ -84,22 +85,44 @@ for (var i = 0; i < response.data2.length; i++) {
 
 ////////////  NOW collect data and draw appropriate buttons for all erp types involved /////////////    
     var erp_buttons=0;
+    var erp_types;
   tx.executeSql('SELECT *  FROM erp_types', [], function (tx, results) {
    var len = results.rows.length, i;
    for (i = 0; i < len; i++){
+       if (erp_types==null)    { erp_types=results.rows.item(i).erp_type_id;} else {erp_types=erp_types+","+results.rows.item(i).erp_type_id;}
+//alert(results.rows.item(i).erp_type_id);       
    if (erp_buttons==0) {
-       erp_buttons=results.rows.item(i).description+" ERP ("+results.rows.item(i).erp_type_id+") Ver.: "+results.rows.item(i).version+"&nbsp;&nbsp;&nbsp;<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a><br><br>"
+       erp_buttons="<div style='float: left;'>"+ results.rows.item(i).description+" ERP. Ver.: "+results.rows.item(i).version+"&nbsp;&nbsp;&nbsp;<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a></div><div style='float: left; color: red; font-weight: bold' id="+results.rows.item(i).erp_type_id+"_unsynched></div><br><br>"
       // 
    } else   {
-  erp_buttons=erp_buttons+results.rows.item(i).description+" ERP ("+results.rows.item(i).erp_type_id+") Ver.: "+results.rows.item(i).version+"&nbsp;&nbsp;&nbsp;<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a><br><br>";
+  erp_buttons=erp_buttons+results.rows.item(i).description+"ERP. Ver.: "+results.rows.item(i).version+"&nbsp;&nbsp;&nbsp;<a class='button' href='erp_content.html?erp_type="+results.rows.item(i).erp_type_id+"'>ERP Type "+results.rows.item(i).erp_type_id+"</a><br><br>";
   //+results.rows.item(i).erp_type_id+"'>"+results.rows.item(i).erp_type_id+"</a>"
    }
    }
-document.getElementById("erp_buttons").innerHTML = erp_buttons;
+db.transaction(function (tx2) {
+    erps_with_unsynched_data="";
+window.erps_with_unsynched_data=erps_with_unsynched_data;
+//   alert(erp_types);
+   var arr_erp_types=erp_types.split(",");
+var a = arr_erp_types;
+for (index = 0; index < a.length; ++index) {
 
+  tx2.executeSql('SELECT count(id)as count,erp_type_id  FROM run_items where erp_type_id='+a[index], [], function (tx2, results2) {
+ if(results2.rows.item(0).count>0)  {
+document.getElementById(results2.rows.item(0).erp_type_id+"_unsynched").innerHTML = ("You have entered ERP execution data into this type which has not been synched.   <a href='' class='button;'>Synch Now</a>");
+ };
   }, null);
 
 
+
+}
+
+})
+
+
+document.getElementById("erp_buttons").innerHTML = erp_buttons;
+
+  }, null);
 });
    
         }
@@ -151,7 +174,7 @@ document.getElementById("erp_buttons").innerHTML = erp_buttons;
     </div login>
 <div id="main" style=" background-color: white; padding: 10px 10px;">
     <div id="title">
-        <div id="cookie_status" class="cookie_status">cookie status</div><img src="https://a3ptech.com/images/a3p_fb_cover.jpg">
+        <div id="cookie_status" class="cookie_status">cookie status</div><img src="https://a3ptech.com/images/a3p_fb_cover.jpg" style="width: 80%;">
             <div class="conn_status"   name="conn_status" id="conn_status" >status</div>
     </div title>
 <br>
