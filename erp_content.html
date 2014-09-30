@@ -8,20 +8,79 @@
 </style>
 <script type="text/javascript">
  $(document).ready(function(){
+/////////////////////////////////////////////////////////////////////////////////////////////
+///// This part saves user input to the device store, then to the server if conn is present//////
+     /////establish variables in global scope     
+       var done="";
+       var na="";
+       var notes="";
+       var erp_type_id=0;
+       var checklist_item_id=0;
+     
+////// use jquery to collect "form" contents for cjhecklist update
+   $("#ajax_content").on("click", ".update_item",(function(){
+       item_id=$(this).attr("id");
+       if ($("#done").prop('checked')==true){
+           done="done";
+       }
+       if ($("#na").prop('checked')==true){
+           done="na";
+       }
+       notes=$("#notes").val();
+       checklist_item_id=$("#checklist_item_id").val();
+       erp_type_id=$("#erp_type_id").val();
+//       alert(notes);
+//        $('#ajax_container').show('slow');
+//        $('#ajax_content').show();
+//        $.ajax({url:"https://a3ptech.com/app/erp_content_ajax.php?action=item_detail&item_id="+item_id,success:function(result){
+//        $('#ajax_content').html(result);} 
+///// open database, and create table "run_items" if it does not yet exist
+var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+var msg;
+db.transaction(function (tx) {
+    now=new Date();
+  tx.executeSql('CREATE TABLE IF NOT EXISTS run_items (id INTEGER PRIMARY KEY, erp_type_id TEXT, checklist_item_id INTEGER, notes TEXT, item_complete TEXT, created_dt TEXT, synch TEXT)');
+//    tx.executeSql("INSERT INTO run_items (erp_type_id, checklist_item_id) VALUES ('"+erp_type_id+"','"+checklist_item_id+"')"); 
+    tx.executeSql("INSERT INTO run_items (erp_type_id, checklist_item_id, notes, item_complete, created_dt) VALUES ('"+erp_type_id+"','"+checklist_item_id+"','"+notes+"','"+done+"','"+now+"')"); 
+window.location.replace("erp_content.html?erp_type="+erp_type_id);
 
+//  tx.executeSql('INSERT INTO LOGS (id, log) VALUES (2, "logmsg")');
+//  msg = '<p>Log message created and row inserted.</p>';
+//  document.querySelector('#status').innerHTML =  msg;
+});
+        ///// place contents of update into server db, as apporpiate
+ ///////// Thus ends the user checklist item update    ////////////////////////////    
+ ///////////////////////////////////////////////////////////////////////////////////    
+        }));
+
+     
    $("#main_content").on("click", "a",(function(){
        item_id=$(this).attr("id");
         $('#ajax_container').show('slow');
         $('#ajax_content').show();
-        $.ajax({url:"https://a3ptech.com/app/erp_content_ajax.php?action=item_detail&item_id="+item_id,success:function(result){
-        $('#ajax_content').html(result);} 
-        });
+/////get data for this checklist item from device store /////        
+var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+db.transaction(function (tx) {
+    tx.executeSql('SELECT * FROM checklist_items where id='+item_id, [], function (tx, results) {
+   var len = results.rows.length, i;
+   for (i = 0; i < len; i++){
+        $('#checklist_item_id').val(results.rows.item(i).checklist_item_id);
+        $('#erp_type_id').val(results.rows.item(i).erp_type_id);
+   }
+ }, null);
+   });  
+ 
+ 
+ 
+//        $.ajax({url:"https://a3ptech.com/app/erp_content_ajax.php?action=item_detail&item_id="+item_id+"&erp_type="+erp_type,success:function(result){
+//        $('#ajax_content').html(result);} 
+        }));
 
    $("#closer_button_div").on("click", "a",(function(){
         $('#ajax_container').hide('slow');
 }));  
         
-   }));
+//   }));
    
    });  
 
@@ -79,7 +138,14 @@ document.getElementById("erp_title").innerHTML =  erp_type;
 <body style="background-color: black;">
 <div id="ajax_container" style="display: none;">
     <div id="closer_button_div" style="float:right;"><a href="" class="button ajax_closer" onclick="return false;">Close</a></div>
-    <div id="ajax_content"></div>
+    <div id="ajax_content">
+        <textarea name="notes" id="notes" style="width: 80%; height: 150px;"></textarea><br>
+        <input type="checkbox" name="done" id="done" value="ON"> Mark as Complete
+        <input type="checkbox" name="na" id="na"> Mark as N/A<br>
+        <input type="hidden" name="erp_type_id" id="erp_type_id" value="">
+        <input type="hidden" name="checklist_item_id" id="checklist_item_id" value="">
+        <button value="Save" class="update_item" id="" onclick="return false;">Save</button>
+    </div>
 </div>
 <div id="main" style=" background-color: white;">
     <div id="title" style="text-align: center; font-size: 1.3em; font-weight: bold;">
