@@ -64,8 +64,9 @@ div#nav_array   {
 }
 div#erp_buttons {
     padding: 10px 10px;
-    background-color: red;
-    color: white;
+    background-color: white;
+    color: navy;
+    border: 5px solid red;
      border-radius: 10px;
 }
 div#ajax_container {
